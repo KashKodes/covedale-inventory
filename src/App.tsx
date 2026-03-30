@@ -26,18 +26,18 @@ import {
   Cloud,
   RefreshCw,
   Plus,
-  KeyRound,
-  Upload,
   Download,
+  ChevronRight,
 } from "lucide-react";
 
-const STORAGE_KEY = "covedale_inventory_system_v3";
+const STORAGE_KEY = "covedale_inventory_system_mobile_v1";
 
-// Paste your Supabase project values here for production deployment.
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "";
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "";
 const isCloudMode = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
-const supabase = isCloudMode ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const supabase = isCloudMode
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 
 const seedUsers = [
   {
@@ -190,14 +190,15 @@ const conditions = [
 
 function nowStamp() {
   const date = new Date();
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
-    date.getDate()
-  ).padStart(2, "0")} ${String(date.getHours()).padStart(2, "0")}:${String(
-    date.getMinutes()
-  ).padStart(2, "0")}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(date.getDate()).padStart(2, "0")} ${String(
+    date.getHours()
+  ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
 
-function saveLocalSystem(data) {
+function saveLocalSystem(data: any) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
@@ -209,7 +210,7 @@ function loadLocalSystem() {
   return starter;
 }
 
-function normalizePartForUI(part) {
+function normalizePartForUI(part: any) {
   return {
     id: part.id,
     partName: part.partName ?? part.part_name ?? "",
@@ -233,7 +234,7 @@ function normalizePartForUI(part) {
   };
 }
 
-function normalizePartForDb(part) {
+function normalizePartForDb(part: any) {
   return {
     id: part.id,
     part_name: part.partName,
@@ -257,7 +258,7 @@ function normalizePartForDb(part) {
   };
 }
 
-function downloadTextFile(filename, text) {
+function downloadTextFile(filename: string, text: string) {
   const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -267,22 +268,37 @@ function downloadTextFile(filename, text) {
   URL.revokeObjectURL(url);
 }
 
-function StatusBadge({ status }) {
-  const styles = {
+function StatusBadge({ status }: { status: string }) {
+  const styles: Record<string, string> = {
     "In Stock": "bg-emerald-500/15 text-emerald-300 border-emerald-400/20",
     Reserved: "bg-amber-500/15 text-amber-300 border-amber-400/20",
     Sold: "bg-slate-500/15 text-slate-300 border-slate-400/20",
-    "Inspection Needed": "bg-rose-500/15 text-rose-300 border-rose-400/20",
+    "Inspection Needed":
+      "bg-rose-500/15 text-rose-300 border-rose-400/20",
   };
 
   return (
-    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${styles[status] || "bg-white/10 text-white border-white/10"}`}>
+    <span
+      className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${
+        styles[status] || "bg-white/10 text-white border-white/10"
+      }`}
+    >
       {status}
     </span>
   );
 }
 
-function StatCard({ title, value, icon: Icon, subtitle }) {
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  subtitle,
+}: {
+  title: string;
+  value: string | number;
+  icon: any;
+  subtitle: string;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -292,7 +308,9 @@ function StatCard({ title, value, icon: Icon, subtitle }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm text-slate-400">{title}</p>
-          <h3 className="mt-2 text-3xl font-semibold text-white">{value}</h3>
+          <h3 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">
+            {value}
+          </h3>
           <p className="mt-2 text-sm text-slate-400">{subtitle}</p>
         </div>
         <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-3">
@@ -303,12 +321,38 @@ function StatCard({ title, value, icon: Icon, subtitle }) {
   );
 }
 
-function Field({ label, children }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <span className="mb-2 block text-sm text-slate-300">{label}</span>
       {children}
     </label>
+  );
+}
+
+function SectionCard({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
+      <h2 className="text-xl font-semibold">{title}</h2>
+      {description ? (
+        <p className="mt-1 text-sm text-slate-400">{description}</p>
+      ) : null}
+      <div className="mt-4">{children}</div>
+    </div>
   );
 }
 
@@ -323,25 +367,33 @@ function LoginScreen({
   loginError,
   registerError,
   loading,
-}) {
+}: any) {
   const [tab, setTab] = useState("login");
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 py-8">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.18),_transparent_28%),radial-gradient(circle_at_bottom_left,_rgba(59,130,246,0.14),_transparent_24%),linear-gradient(to_bottom,_#020617,_#020617)]" />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative w-full max-w-md rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-2xl backdrop-blur-xl"
+        className="relative w-full max-w-md rounded-[32px] border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur-xl sm:p-8"
       >
         <div className="mb-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-cyan-400/20 bg-cyan-400/10">
             <Wrench className="h-8 w-8 text-cyan-300" />
           </div>
-          <h1 className="mt-5 text-3xl font-semibold text-white">Covedale Service Center</h1>
-          <p className="mt-2 text-sm text-slate-400">Inventory access for shop staff and administrators</p>
+          <h1 className="mt-5 text-2xl font-semibold text-white sm:text-3xl">
+            Covedale Service Center
+          </h1>
+          <p className="mt-2 text-sm text-slate-400">
+            Inventory access for shop staff and administrators
+          </p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900/50 px-3 py-1 text-xs text-slate-300">
-            {mode === "cloud" ? <Cloud className="h-3.5 w-3.5 text-cyan-300" /> : <Database className="h-3.5 w-3.5 text-cyan-300" />}
+            {mode === "cloud" ? (
+              <Cloud className="h-3.5 w-3.5 text-cyan-300" />
+            ) : (
+              <Database className="h-3.5 w-3.5 text-cyan-300" />
+            )}
             {mode === "cloud" ? "Cloud production mode" : "Local demo mode"}
           </div>
         </div>
@@ -349,13 +401,19 @@ function LoginScreen({
         <div className="mb-5 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-slate-900/45 p-1">
           <button
             onClick={() => setTab("login")}
-            className={`rounded-xl px-4 py-2 text-sm ${tab === "login" ? "bg-cyan-400/15 text-cyan-100" : "text-slate-300"}`}
+            className={`rounded-xl px-4 py-2.5 text-sm ${
+              tab === "login" ? "bg-cyan-400/15 text-cyan-100" : "text-slate-300"
+            }`}
           >
             Sign In
           </button>
           <button
             onClick={() => setTab("register")}
-            className={`rounded-xl px-4 py-2 text-sm ${tab === "register" ? "bg-cyan-400/15 text-cyan-100" : "text-slate-300"}`}
+            className={`rounded-xl px-4 py-2.5 text-sm ${
+              tab === "register"
+                ? "bg-cyan-400/15 text-cyan-100"
+                : "text-slate-300"
+            }`}
           >
             Request Access
           </button>
@@ -375,7 +433,12 @@ function LoginScreen({
                 <input
                   type="email"
                   value={loginForm.email}
-                  onChange={(e) => setLoginForm((prev) => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) =>
+                    setLoginForm((prev: any) => ({
+                      ...prev,
+                      email: e.target.value,
+                    }))
+                  }
                   className="w-full rounded-2xl border border-white/10 bg-slate-900/60 py-3 pl-11 pr-4 text-white outline-none"
                   placeholder="Enter your work email"
                 />
@@ -388,7 +451,12 @@ function LoginScreen({
                 <input
                   type="password"
                   value={loginForm.password}
-                  onChange={(e) => setLoginForm((prev) => ({ ...prev, password: e.target.value }))}
+                  onChange={(e) =>
+                    setLoginForm((prev: any) => ({
+                      ...prev,
+                      password: e.target.value,
+                    }))
+                  }
                   className="w-full rounded-2xl border border-white/10 bg-slate-900/60 py-3 pl-11 pr-4 text-white outline-none"
                   placeholder="Enter your password"
                 />
@@ -420,7 +488,12 @@ function LoginScreen({
             <Field label="Full Name">
               <input
                 value={registerForm.name}
-                onChange={(e) => setRegisterForm((prev) => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setRegisterForm((prev: any) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }))
+                }
                 className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
                 placeholder="Enter full name"
               />
@@ -429,7 +502,12 @@ function LoginScreen({
               <input
                 type="email"
                 value={registerForm.email}
-                onChange={(e) => setRegisterForm((prev) => ({ ...prev, email: e.target.value }))}
+                onChange={(e) =>
+                  setRegisterForm((prev: any) => ({
+                    ...prev,
+                    email: e.target.value,
+                  }))
+                }
                 className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
                 placeholder="Enter work email"
               />
@@ -438,7 +516,12 @@ function LoginScreen({
               <input
                 type="password"
                 value={registerForm.password}
-                onChange={(e) => setRegisterForm((prev) => ({ ...prev, password: e.target.value }))}
+                onChange={(e) =>
+                  setRegisterForm((prev: any) => ({
+                    ...prev,
+                    password: e.target.value,
+                  }))
+                }
                 className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
                 placeholder="Create password"
               />
@@ -455,7 +538,11 @@ function LoginScreen({
               disabled={loading}
               className="w-full rounded-2xl border border-cyan-300/30 bg-cyan-400/15 px-5 py-3 font-medium text-cyan-100 transition hover:bg-cyan-400/20 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading ? "Creating Account..." : mode === "cloud" ? "Create Cloud Account" : "Create Demo Account"}
+              {loading
+                ? "Creating Account..."
+                : mode === "cloud"
+                ? "Create Cloud Account"
+                : "Create Demo Account"}
             </button>
           </form>
         )}
@@ -463,7 +550,9 @@ function LoginScreen({
         {mode === "local" && (
           <div className="mt-6 rounded-2xl border border-white/10 bg-slate-900/45 p-4 text-sm text-slate-300">
             <p className="font-medium text-white">Demo credentials</p>
-            <p className="mt-2">Admin: admin@covedaleservicecenter.com / admin123</p>
+            <p className="mt-2">
+              Admin: admin@covedaleservicecenter.com / admin123
+            </p>
             <p>Staff: staff@covedaleservicecenter.com / staff123</p>
           </div>
         )}
@@ -472,34 +561,127 @@ function LoginScreen({
   );
 }
 
-export default function CovedaleInventoryDeployableApp() {
+function PartDetailsContent({ part }: { part: any }) {
+  return (
+    <div className="space-y-4 text-sm">
+      <div className="rounded-3xl border border-white/10 bg-slate-900/45 p-4">
+        <div className="mb-3 flex items-center gap-2 text-slate-200">
+          <Car className="h-4 w-4 text-cyan-300" /> Source Information
+        </div>
+        <div className="space-y-2 text-slate-300">
+          <p>
+            <span className="text-slate-500">VIN:</span> {part.sourceVin}
+          </p>
+          <p>
+            <span className="text-slate-500">Vehicle:</span> {part.sourceVehicle}
+          </p>
+          <p>
+            <span className="text-slate-500">Future Fitment:</span>{" "}
+            {part.fitsVehicle}
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-white/10 bg-slate-900/45 p-4">
+        <div className="mb-3 flex items-center gap-2 text-slate-200">
+          <DollarSign className="h-4 w-4 text-cyan-300" /> Pricing & Inventory
+        </div>
+        <div className="grid gap-2 text-slate-300 sm:grid-cols-2">
+          <p>
+            <span className="text-slate-500">Retail Price:</span> ${part.price}
+          </p>
+          <p>
+            <span className="text-slate-500">Internal Cost:</span> ${part.cost}
+          </p>
+          <p>
+            <span className="text-slate-500">Quantity:</span> {part.stockQty}
+          </p>
+          <p>
+            <span className="text-slate-500">Warranty:</span> {part.warranty}
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-white/10 bg-slate-900/45 p-4">
+        <div className="mb-3 flex items-center gap-2 text-slate-200">
+          <MapPin className="h-4 w-4 text-cyan-300" /> Storage & Metadata
+        </div>
+        <div className="space-y-2 text-slate-300">
+          <p>
+            <span className="text-slate-500">Location:</span> {part.location}
+          </p>
+          <p>
+            <span className="text-slate-500">Supplier:</span> {part.supplier}
+          </p>
+          <p>
+            <span className="text-slate-500">Acquired:</span> {part.acquiredDate}
+          </p>
+          <p>
+            <span className="text-slate-500">Condition:</span> {part.condition}
+          </p>
+          <p>
+            <span className="text-slate-500">OEM #:</span> {part.oemNumber}
+          </p>
+          <p>
+            <span className="text-slate-500">Updated At:</span> {part.updatedAt}
+          </p>
+          <p>
+            <span className="text-slate-500">Created By:</span> {part.createdBy}
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-3xl border border-white/10 bg-slate-900/45 p-4">
+        <div className="mb-3 flex items-center gap-2 text-slate-200">
+          <FileText className="h-4 w-4 text-cyan-300" /> Notes
+        </div>
+        <p className="leading-6 text-slate-300">
+          {part.notes || "No notes recorded for this part yet."}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function CovedaleInventoryMobileOptimizedApp() {
   const [mode] = useState(isCloudMode ? "cloud" : "local");
-  const [system, setSystem] = useState({ users: [], parts: [] });
-  const [currentUser, setCurrentUser] = useState(null);
+  const [system, setSystem] = useState<{ users: any[]; parts: any[] }>({
+    users: [],
+    parts: [],
+  });
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [loginForm, setLoginForm] = useState({
     email: mode === "local" ? "admin@covedaleservicecenter.com" : "",
     password: mode === "local" ? "admin123" : "",
   });
-  const [registerForm, setRegisterForm] = useState({ name: "", email: "", password: "" });
+  const [registerForm, setRegisterForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
   const [loginError, setLoginError] = useState("");
   const [registerError, setRegisterError] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [selectedPart, setSelectedPart] = useState(null);
+  const [selectedPart, setSelectedPart] = useState<any>(null);
+  const [mobileDetailsOpen, setMobileDetailsOpen] = useState(false);
   const [showPartModal, setShowPartModal] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [form, setForm] = useState({ ...emptyForm, id: `CSC-${Math.floor(1000 + Math.random() * 9000)}` });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<any>({
+    ...emptyForm,
+    id: `CSC-${Math.floor(1000 + Math.random() * 9000)}`,
+  });
   const [loading, setLoading] = useState(true);
   const [authLoading, setAuthLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [banner, setBanner] = useState("");
 
-  const showBanner = (text) => {
+  const showBanner = (text: string) => {
     setBanner(text);
-    window.clearTimeout(showBanner._timer);
-    showBanner._timer = window.setTimeout(() => setBanner(""), 3000);
+    window.clearTimeout((showBanner as any)._timer);
+    (showBanner as any)._timer = window.setTimeout(() => setBanner(""), 3000);
   };
 
   const bootLocal = () => {
@@ -511,7 +693,7 @@ export default function CovedaleInventoryDeployableApp() {
   };
 
   const fetchCloudParts = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await supabase!
       .from("parts_inventory")
       .select("*")
       .order("updated_at", { ascending: false });
@@ -519,14 +701,19 @@ export default function CovedaleInventoryDeployableApp() {
     if (error) throw error;
     const normalized = (data || []).map(normalizePartForUI);
     setSystem((prev) => ({ ...prev, parts: normalized }));
-    setSelectedPart((current) => normalized.find((item) => item.id === current?.id) || normalized[0] || null);
+    setSelectedPart(
+      (current) =>
+        normalized.find((item) => item.id === current?.id) ||
+        normalized[0] ||
+        null
+    );
   };
 
-  const hydrateCloudUser = async (authUser) => {
-    const user = authUser || (await supabase.auth.getUser()).data.user;
+  const hydrateCloudUser = async (authUser?: any) => {
+    const user = authUser || (await supabase!.auth.getUser()).data.user;
     if (!user) return null;
 
-    const { data: profile } = await supabase
+    const { data: profile } = await supabase!
       .from("user_profiles")
       .select("full_name, role")
       .eq("id", user.id)
@@ -544,12 +731,12 @@ export default function CovedaleInventoryDeployableApp() {
 
   useEffect(() => {
     let mounted = true;
-    let unsubscribe;
+    let unsubscribe: any;
 
     const init = async () => {
       try {
         if (mode === "cloud") {
-          const { data: sessionData } = await supabase.auth.getSession();
+          const { data: sessionData } = await supabase!.auth.getSession();
           if (!mounted) return;
 
           if (sessionData.session?.user) {
@@ -557,22 +744,24 @@ export default function CovedaleInventoryDeployableApp() {
             await fetchCloudParts();
           }
 
-          const { data } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            if (!mounted) return;
-            if (session?.user) {
-              await hydrateCloudUser(session.user);
-              await fetchCloudParts();
-            } else {
-              setCurrentUser(null);
+          const { data } = supabase!.auth.onAuthStateChange(
+            async (_event, session) => {
+              if (!mounted) return;
+              if (session?.user) {
+                await hydrateCloudUser(session.user);
+                await fetchCloudParts();
+              } else {
+                setCurrentUser(null);
+              }
             }
-          });
+          );
           unsubscribe = data.subscription.unsubscribe;
           setLoading(false);
           return;
         }
 
         bootLocal();
-      } catch (error) {
+      } catch (error: any) {
         if (mounted) {
           showBanner(error.message || "Unable to load system.");
           setLoading(false);
@@ -606,17 +795,29 @@ export default function CovedaleInventoryDeployableApp() {
         part.oemNumber.toLowerCase().includes(q) ||
         part.location.toLowerCase().includes(q);
 
-      const matchesCategory = categoryFilter === "All" || part.category === categoryFilter;
-      const matchesStatus = statusFilter === "All" || part.status === statusFilter;
+      const matchesCategory =
+        categoryFilter === "All" || part.category === categoryFilter;
+      const matchesStatus =
+        statusFilter === "All" || part.status === statusFilter;
       return matchesQuery && matchesCategory && matchesStatus;
     });
   }, [system.parts, query, categoryFilter, statusFilter]);
 
   const stats = useMemo(() => {
-    const totalUnits = system.parts.reduce((sum, item) => sum + Number(item.stockQty || 0), 0);
-    const inventoryValue = system.parts.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.stockQty || 0), 0);
-    const lowStock = system.parts.filter((item) => Number(item.stockQty) <= 1).length;
-    const inspections = system.parts.filter((item) => item.status === "Inspection Needed").length;
+    const totalUnits = system.parts.reduce(
+      (sum, item) => sum + Number(item.stockQty || 0),
+      0
+    );
+    const inventoryValue = system.parts.reduce(
+      (sum, item) => sum + Number(item.price || 0) * Number(item.stockQty || 0),
+      0
+    );
+    const lowStock = system.parts.filter(
+      (item) => Number(item.stockQty) <= 1
+    ).length;
+    const inspections = system.parts.filter(
+      (item) => item.status === "Inspection Needed"
+    ).length;
     return { totalUnits, inventoryValue, lowStock, inspections };
   }, [system.parts]);
 
@@ -625,7 +826,7 @@ export default function CovedaleInventoryDeployableApp() {
     setLoginError("");
     try {
       if (mode === "cloud") {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase!.auth.signInWithPassword({
           email: loginForm.email,
           password: loginForm.password,
         });
@@ -634,12 +835,14 @@ export default function CovedaleInventoryDeployableApp() {
         await fetchCloudParts();
       } else {
         const match = system.users.find(
-          (user) => user.email.toLowerCase() === loginForm.email.toLowerCase() && user.password === loginForm.password
+          (user) =>
+            user.email.toLowerCase() === loginForm.email.toLowerCase() &&
+            user.password === loginForm.password
         );
         if (!match) throw new Error("Invalid email or password.");
         setCurrentUser(match);
       }
-    } catch (error) {
+    } catch (error: any) {
       setLoginError(error.message || "Login failed.");
     } finally {
       setAuthLoading(false);
@@ -655,7 +858,7 @@ export default function CovedaleInventoryDeployableApp() {
       }
 
       if (mode === "cloud") {
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await supabase!.auth.signUp({
           email: registerForm.email,
           password: registerForm.password,
           options: {
@@ -667,18 +870,22 @@ export default function CovedaleInventoryDeployableApp() {
         if (error) throw error;
 
         if (data.user) {
-          const { error: profileError } = await supabase.from("user_profiles").upsert({
-            id: data.user.id,
-            full_name: registerForm.name,
-            role: "Staff",
-            email: registerForm.email,
-          });
+          const { error: profileError } = await supabase!
+            .from("user_profiles")
+            .upsert({
+              id: data.user.id,
+              full_name: registerForm.name,
+              role: "Staff",
+              email: registerForm.email,
+            });
           if (profileError) throw profileError;
         }
 
         showBanner("Cloud account created. Sign in with your new credentials.");
       } else {
-        const exists = system.users.some((u) => u.email.toLowerCase() === registerForm.email.toLowerCase());
+        const exists = system.users.some(
+          (u) => u.email.toLowerCase() === registerForm.email.toLowerCase()
+        );
         if (exists) throw new Error("An account with that email already exists.");
 
         const newUser = {
@@ -693,7 +900,7 @@ export default function CovedaleInventoryDeployableApp() {
       }
 
       setRegisterForm({ name: "", email: "", password: "" });
-    } catch (error) {
+    } catch (error: any) {
       setRegisterError(error.message || "Unable to create account.");
     } finally {
       setAuthLoading(false);
@@ -702,7 +909,7 @@ export default function CovedaleInventoryDeployableApp() {
 
   const handleLogout = async () => {
     if (mode === "cloud") {
-      await supabase.auth.signOut();
+      await supabase!.auth.signOut();
     }
     setCurrentUser(null);
   };
@@ -713,7 +920,7 @@ export default function CovedaleInventoryDeployableApp() {
     try {
       await fetchCloudParts();
       showBanner("Inventory synced from cloud database.");
-    } catch (error) {
+    } catch (error: any) {
       showBanner(error.message || "Sync failed.");
     } finally {
       setSyncing(false);
@@ -745,49 +952,14 @@ export default function CovedaleInventoryDeployableApp() {
 
     const rows = system.parts.map((part) =>
       headers
-        .map((key) => `"${String(part[key] ?? "").replaceAll('"', '""')}"`)
+        .map((key) => `"${String((part as any)[key] ?? "").replaceAll('"', '""')}"`)
         .join(",")
     );
 
-    downloadTextFile("covedale-inventory-export.csv", [headers.join(","), ...rows].join("\n"));
-  };
-
-  const handleImportJson = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      const parsed = JSON.parse(text);
-      const incoming = Array.isArray(parsed) ? parsed : parsed.parts;
-      if (!Array.isArray(incoming)) throw new Error("JSON must contain an array of parts.");
-
-      const normalized = incoming.map(normalizePartForUI);
-
-      if (mode === "cloud") {
-        const payload = normalized.map((part) => normalizePartForDb(part));
-        const { error } = await supabase.from("parts_inventory").upsert(payload);
-        if (error) throw error;
-        await fetchCloudParts();
-      } else {
-        setSystem((prev) => ({ ...prev, parts: normalized }));
-        setSelectedPart(normalized[0] || null);
-      }
-
-      showBanner("Inventory import completed.");
-      event.target.value = "";
-    } catch (error) {
-      showBanner(error.message || "Import failed.");
-    }
-  };
-
-  const downloadSetupFiles = () => {
-    const sql = `-- Run this in Supabase SQL Editor\n\ncreate table if not exists public.user_profiles (\n  id uuid primary key references auth.users(id) on delete cascade,\n  email text unique,\n  full_name text,\n  role text default 'Staff',\n  created_at timestamptz default now()\n);\n\ncreate table if not exists public.parts_inventory (\n  id text primary key,\n  part_name text not null,\n  category text,\n  condition text,\n  source_vin text,\n  source_vehicle text,\n  fits_vehicle text,\n  oem_number text,\n  stock_qty integer default 0,\n  price numeric default 0,\n  cost numeric default 0,\n  location text,\n  supplier text,\n  acquired_date date,\n  warranty text,\n  status text default 'In Stock',\n  notes text,\n  created_by text,\n  updated_at text\n);\n\nalter table public.user_profiles enable row level security;\nalter table public.parts_inventory enable row level security;\n\ncreate policy \"profiles readable by signed in users\" on public.user_profiles\nfor select to authenticated using (true);\n\ncreate policy \"profiles upsert by signed in users\" on public.user_profiles\nfor all to authenticated using (auth.uid() = id) with check (auth.uid() = id);\n\ncreate policy \"parts readable by signed in users\" on public.parts_inventory\nfor select to authenticated using (true);\n\ncreate policy \"parts insert by signed in users\" on public.parts_inventory\nfor insert to authenticated with check (true);\n\ncreate policy \"parts update by signed in users\" on public.parts_inventory\nfor update to authenticated using (true);\n\ncreate policy \"parts delete by signed in users\" on public.parts_inventory\nfor delete to authenticated using (true);`;
-
-    const env = `# Add these to your Vercel project environment variables\nVITE_SUPABASE_URL=your_supabase_url_here\nVITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here`;
-
-    downloadTextFile("supabase-setup.sql", sql);
-    window.setTimeout(() => downloadTextFile("vercel-env.txt", env), 250);
+    downloadTextFile(
+      "covedale-inventory-export.csv",
+      [headers.join(","), ...rows].join("\n")
+    );
   };
 
   const resetForm = () => {
@@ -804,16 +976,22 @@ export default function CovedaleInventoryDeployableApp() {
     setShowPartModal(true);
   };
 
-  const openEdit = (part) => {
+  const openEdit = (part: any) => {
     setForm({ ...part });
     setEditingId(part.id);
     setShowPartModal(true);
   };
 
-  const savePart = async (e) => {
-  e.preventDefault();
-  console.log("SAVE BUTTON CLICKED");
+  const openPartDetails = (part: any) => {
+    setSelectedPart(part);
+    if (window.innerWidth < 1024) {
+      setMobileDetailsOpen(true);
+    }
+  };
+
+  const savePart = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const payload = {
       ...form,
       stockQty: Number(form.stockQty),
@@ -825,7 +1003,7 @@ export default function CovedaleInventoryDeployableApp() {
 
     try {
       if (mode === "cloud") {
-        const { data, error } = await supabase
+        const { data, error } = await supabase!
           .from("parts_inventory")
           .upsert(normalizePartForDb(payload))
           .select();
@@ -848,15 +1026,18 @@ export default function CovedaleInventoryDeployableApp() {
       resetForm();
       setActiveTab("inventory");
       showBanner(editingId ? "Part updated successfully." : "Part added successfully.");
-    } catch (error) {
+    } catch (error: any) {
       showBanner(error.message || "Unable to save part.");
     }
   };
 
-  const deletePart = async (partId) => {
+  const deletePart = async (partId: string) => {
     try {
       if (mode === "cloud") {
-        const { error } = await supabase.from("parts_inventory").delete().eq("id", partId);
+        const { error } = await supabase!
+          .from("parts_inventory")
+          .delete()
+          .eq("id", partId);
         if (error) throw error;
       }
 
@@ -864,7 +1045,8 @@ export default function CovedaleInventoryDeployableApp() {
       setSystem((prev) => ({ ...prev, parts: updatedParts }));
       if (selectedPart?.id === partId) setSelectedPart(updatedParts[0] || null);
       showBanner("Part deleted successfully.");
-    } catch (error) {
+      setMobileDetailsOpen(false);
+    } catch (error: any) {
       showBanner(error.message || "Unable to delete part.");
     }
   };
@@ -900,48 +1082,69 @@ export default function CovedaleInventoryDeployableApp() {
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(34,211,238,0.16),_transparent_28%),radial-gradient(circle_at_top_left,_rgba(59,130,246,0.14),_transparent_24%),linear-gradient(to_bottom,_#020617,_#020617)]" />
-      <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+
+      <div className="relative mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 overflow-hidden rounded-[28px] border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl"
         >
-          <div className="flex flex-col gap-6 p-6 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex flex-col gap-5 p-5 sm:p-6 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-200">
-                {mode === "cloud" ? <Cloud className="h-3.5 w-3.5" /> : <Database className="h-3.5 w-3.5" />}
-                {mode === "cloud" ? "Cloud Inventory System" : "Demo Inventory System"} · Covedale Service Center · Cincinnati, Ohio
+                {mode === "cloud" ? (
+                  <Cloud className="h-3.5 w-3.5" />
+                ) : (
+                  <Database className="h-3.5 w-3.5" />
+                )}
+                {mode === "cloud" ? "Cloud Inventory System" : "Demo Inventory System"} · Covedale Service Center
               </div>
-              <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-                Parts Inventory + Real Auth Portal
+
+              <h1 className="mt-4 text-2xl font-semibold tracking-tight text-white sm:text-3xl lg:text-4xl">
+                Parts Inventory Portal
               </h1>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base">
-                Built for real daily use with searchable part records, VIN source history, fitment tracking, pricing, staff access, and deployment-ready Supabase support.
+                Track sourced parts by VIN, fitment, pricing, quantity, and storage
+                location in one clean shop-ready system.
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[340px]">
               <div className="rounded-2xl border border-white/10 bg-slate-900/55 px-4 py-3">
                 <p className="text-xs text-slate-500">Signed in as</p>
                 <div className="mt-1 flex items-center gap-2 text-sm text-white">
-                  {currentUser.role === "Admin" ? <Shield className="h-4 w-4 text-cyan-300" /> : <User className="h-4 w-4 text-cyan-300" />}
+                  {currentUser.role === "Admin" ? (
+                    <Shield className="h-4 w-4 text-cyan-300" />
+                  ) : (
+                    <User className="h-4 w-4 text-cyan-300" />
+                  )}
                   {currentUser.name} · {currentUser.role}
                 </div>
               </div>
-              {mode === "cloud" && (
+
+              <div className="flex gap-3 sm:justify-end">
+                {mode === "cloud" && (
+                  <button
+                    onClick={refreshCloud}
+                    className="flex-1 rounded-2xl border border-cyan-300/20 bg-cyan-400/10 px-4 py-3 text-sm font-medium text-cyan-100 transition hover:bg-cyan-400/20 sm:flex-none"
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
+                      Sync
+                    </span>
+                  </button>
+                )}
+
                 <button
-                  onClick={refreshCloud}
-                  className="inline-flex items-center gap-2 rounded-2xl border border-cyan-300/20 bg-cyan-400/10 px-4 py-3 text-sm font-medium text-cyan-100 transition hover:bg-cyan-400/20"
+                  onClick={handleLogout}
+                  className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10 sm:flex-none"
                 >
-                  <RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} /> Sync
+                  <span className="inline-flex items-center gap-2">
+                    <LogOut className="h-4 w-4" />
+                    Log Out
+                  </span>
                 </button>
-              )}
-              <button
-                onClick={handleLogout}
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
-              >
-                <LogOut className="h-4 w-4" /> Log Out
-              </button>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -952,70 +1155,89 @@ export default function CovedaleInventoryDeployableApp() {
           </div>
         )}
 
-        <div className="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <StatCard title="Total Units" value={stats.totalUnits} icon={Package} subtitle="All live inventory units in the system" />
-          <StatCard title="Inventory Value" value={`$${stats.inventoryValue.toLocaleString()}`} icon={DollarSign} subtitle="Based on current retail pricing" />
-          <StatCard title="Low Stock Alerts" value={stats.lowStock} icon={AlertCircle} subtitle="Parts with quantity at 1 or below" />
-          <StatCard title="Inspection Needed" value={stats.inspections} icon={Clock3} subtitle="Items that still need verification" />
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <StatCard
+            title="Total Units"
+            value={stats.totalUnits}
+            icon={Package}
+            subtitle="All inventory units"
+          />
+          <StatCard
+            title="Inventory Value"
+            value={`$${stats.inventoryValue.toLocaleString()}`}
+            icon={DollarSign}
+            subtitle="Current retail pricing"
+          />
+          <StatCard
+            title="Low Stock Alerts"
+            value={stats.lowStock}
+            icon={AlertCircle}
+            subtitle="Quantity at 1 or below"
+          />
+          <StatCard
+            title="Inspection Needed"
+            value={stats.inspections}
+            icon={Clock3}
+            subtitle="Items awaiting verification"
+          />
         </div>
 
-        <div className="mb-6 flex flex-wrap gap-3">
-          {[
-            ["dashboard", "Dashboard"],
-            ["inventory", "Inventory"],
-          ].map(([key, label]) => (
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
+            {[
+              ["dashboard", "Dashboard"],
+              ["inventory", "Inventory"],
+            ].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className={`rounded-2xl border px-4 py-3 text-sm font-medium transition ${
+                  activeTab === key
+                    ? "border-cyan-300/30 bg-cyan-400/15 text-cyan-200"
+                    : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-3 sm:ml-auto sm:flex-row sm:flex-wrap">
             <button
-              key={key}
-              onClick={() => setActiveTab(key)}
-              className={`rounded-2xl border px-4 py-3 text-sm font-medium transition ${
-                activeTab === key
-                  ? "border-cyan-300/30 bg-cyan-400/15 text-cyan-200"
-                  : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-              }`}
+              onClick={openCreate}
+              className="rounded-2xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-3 text-sm font-medium text-cyan-100 transition hover:bg-cyan-400/20"
             >
-              {label}
+              <span className="inline-flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Add Part
+              </span>
             </button>
-          ))}
 
-          <button
-            onClick={openCreate}
-            className="inline-flex items-center gap-2 rounded-2xl border border-cyan-300/30 bg-cyan-400/15 px-4 py-3 text-sm font-medium text-cyan-100 transition hover:bg-cyan-400/20"
-          >
-            <Plus className="h-4 w-4" /> Add Part
-          </button>
-
-          <button
-            onClick={exportCsv}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
-          >
-            <Download className="h-4 w-4" /> Export CSV
-          </button>
-
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10">
-            <Upload className="h-4 w-4" /> Import JSON
-            <input type="file" accept="application/json" className="hidden" onChange={handleImportJson} />
-          </label>
-
-          <button
-            onClick={downloadSetupFiles}
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
-          >
-            <KeyRound className="h-4 w-4" /> Setup Files
-          </button>
+            <button
+              onClick={exportCsv}
+              className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200 transition hover:bg-white/10"
+            >
+              <span className="inline-flex items-center gap-2">
+                <Download className="h-4 w-4" />
+                Export CSV
+              </span>
+            </button>
+          </div>
         </div>
 
         {activeTab === "dashboard" && (
           <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold">Recent Inventory Activity</h2>
-                  <p className="mt-1 text-sm text-slate-400">Newest records added or updated in the system</p>
-                </div>
-              </div>
+            <SectionCard
+              title="Recent Inventory Activity"
+              description="Newest records added or updated in the system"
+            >
               <div className="space-y-3">
                 {system.parts.slice(0, 5).map((part) => (
-                  <div key={part.id} className="rounded-3xl border border-white/10 bg-slate-900/45 p-4">
+                  <button
+                    key={part.id}
+                    onClick={() => openPartDetails(part)}
+                    className="w-full rounded-3xl border border-white/10 bg-slate-900/45 p-4 text-left transition hover:bg-white/10"
+                  >
                     <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
@@ -1023,260 +1245,342 @@ export default function CovedaleInventoryDeployableApp() {
                           <StatusBadge status={part.status} />
                         </div>
                         <div className="mt-3 grid gap-2 text-sm text-slate-300 sm:grid-cols-2">
-                          <p><span className="text-slate-500">Part ID:</span> {part.id}</p>
-                          <p><span className="text-slate-500">Source VIN:</span> {part.sourceVin}</p>
-                          <p><span className="text-slate-500">Source Vehicle:</span> {part.sourceVehicle}</p>
-                          <p><span className="text-slate-500">Fits:</span> {part.fitsVehicle}</p>
+                          <p>
+                            <span className="text-slate-500">Part ID:</span> {part.id}
+                          </p>
+                          <p>
+                            <span className="text-slate-500">Source VIN:</span>{" "}
+                            {part.sourceVin}
+                          </p>
+                          <p>
+                            <span className="text-slate-500">Source Vehicle:</span>{" "}
+                            {part.sourceVehicle}
+                          </p>
+                          <p>
+                            <span className="text-slate-500">Fits:</span>{" "}
+                            {part.fitsVehicle}
+                          </p>
                         </div>
                       </div>
                       <div className="text-left md:text-right">
-                        <p className="text-2xl font-semibold text-white">${part.price}</p>
-                        <p className="mt-2 text-sm text-slate-400">Updated: {part.updatedAt}</p>
+                        <p className="text-2xl font-semibold text-white">
+                          ${part.price}
+                        </p>
+                        <p className="mt-2 text-sm text-slate-400">
+                          Updated: {part.updatedAt}
+                        </p>
                         <p className="text-sm text-slate-400">By: {part.createdBy}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-<div className="space-y-6">
-  <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
-    <h2 className="text-xl font-semibold">System Highlights</h2>
-    <div className="mt-4 grid gap-3">
-      {[
-        "Secure staff login with cloud-backed access",
-        "VIN source tracking for every inventory item",
-        "Future fitment tracking for compatible vehicles",
-        "Pricing, cost, quantity, warranty, and supplier fields",
-        "Clean inventory search, edit, and management workflow",
-        "Built for daily shop use across desktop and mobile browsers",
-      ].map((item) => (
-        <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/40 px-4 py-3 text-sm text-slate-200">
-          <CheckCircle2 className="h-4 w-4 text-cyan-300" />
-          {item}
-        </div>
-      ))}
-    </div>
-  </div>
-
-  <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
-    <h2 className="text-xl font-semibold">Built for Covedale Service Center</h2>
-    <div className="mt-4 space-y-3 text-sm text-slate-300">
-      <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">
-        Track every part by source VIN, source vehicle, and future fitment in one place.
-      </p>
-      <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">
-        Give staff a polished internal system for inventory lookup, intake, pricing, and updates.
-      </p>
-      <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">
-        Present a clean, professional product experience that is ready for real shop operations.
-      </p>
-    </div>
-  </div>
-</div>
-          </div>
-        )}
-
-        {activeTab === "inventory" && (
-          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
-              <div className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold">Inventory Records</h2>
-                  <p className="mt-1 text-sm text-slate-400">Search by VIN, vehicle, fitment, part ID, OEM number, or location.</p>
-                </div>
-
-                <div className="grid gap-3 md:grid-cols-3">
-                  <div className="relative">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <input
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Search inventory..."
-                      className="w-full rounded-2xl border border-white/10 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white outline-none placeholder:text-slate-500"
-                    />
-                  </div>
-
-                  <div className="relative">
-                    <Filter className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                    <select
-                      value={categoryFilter}
-                      onChange={(e) => setCategoryFilter(e.target.value)}
-                      className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white outline-none"
-                    >
-                      <option>All</option>
-                      {categories.map((category) => (
-                        <option key={category}>{category}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white outline-none"
-                  >
-                    <option>All</option>
-                    {statuses.map((status) => (
-                      <option key={status}>{status}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid gap-3">
-                {filteredParts.map((part) => (
-                  <button
-                    key={part.id}
-                    onClick={() => setSelectedPart(part)}
-                    className={`rounded-3xl border p-4 text-left transition ${
-                      selectedPart?.id === part.id ? "border-cyan-300/30 bg-cyan-400/10" : "border-white/10 bg-slate-900/50 hover:bg-white/10"
-                    }`}
-                  >
-                    <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-base font-semibold text-white">{part.partName}</h3>
-                          <StatusBadge status={part.status} />
-                        </div>
-                        <div className="mt-3 grid gap-2 text-sm text-slate-300 sm:grid-cols-2">
-                          <p><span className="text-slate-500">Part ID:</span> {part.id}</p>
-                          <p><span className="text-slate-500">Category:</span> {part.category}</p>
-                          <p><span className="text-slate-500">Source VIN:</span> {part.sourceVin}</p>
-                          <p><span className="text-slate-500">Source Car:</span> {part.sourceVehicle}</p>
-                          <p><span className="text-slate-500">Fits:</span> {part.fitsVehicle}</p>
-                          <p><span className="text-slate-500">Location:</span> {part.location}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-3 xl:min-w-[180px]">
-                        <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm">
-                          <p className="text-slate-400">Price</p>
-                          <p className="text-2xl font-semibold text-white">${part.price}</p>
-                          <p className="mt-2 text-slate-400">Qty: {part.stockQty}</p>
-                        </div>
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedPart(part);
-                            }}
-                            className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-200 hover:bg-white/10"
-                          >
-                            <span className="inline-flex items-center gap-2"><Eye className="h-3.5 w-3.5" /> View</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openEdit(part);
-                            }}
-                            className="flex-1 rounded-2xl border border-cyan-300/20 bg-cyan-400/10 px-3 py-2 text-xs text-cyan-100 hover:bg-cyan-400/20"
-                          >
-                            <span className="inline-flex items-center gap-2"><Pencil className="h-3.5 w-3.5" /> Edit</span>
-                          </button>
-                          {currentUser.role === "Admin" && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deletePart(part.id);
-                              }}
-                              className="rounded-2xl border border-rose-300/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-100 hover:bg-rose-500/20"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          )}
-                        </div>
                       </div>
                     </div>
                   </button>
                 ))}
               </div>
+            </SectionCard>
+
+            <div className="space-y-6">
+              <SectionCard title="System Highlights">
+                <div className="grid gap-3">
+                  {[
+                    "Secure staff login with cloud-backed access",
+                    "VIN source tracking for every inventory item",
+                    "Future fitment tracking for compatible vehicles",
+                    "Pricing, cost, quantity, warranty, and supplier fields",
+                    "Clean search, edit, and inventory workflow",
+                    "Built for daily shop use across desktop and mobile browsers",
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/40 px-4 py-3 text-sm text-slate-200"
+                    >
+                      <CheckCircle2 className="h-4 w-4 text-cyan-300" />
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </SectionCard>
+
+              <SectionCard title="Built for Covedale Service Center">
+                <div className="space-y-3 text-sm text-slate-300">
+                  <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">
+                    Track every part by source VIN, source vehicle, and future fitment
+                    in one place.
+                  </p>
+                  <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">
+                    Give staff a polished internal system for inventory lookup,
+                    intake, pricing, and updates.
+                  </p>
+                  <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">
+                    Present a clean, professional product experience that is ready
+                    for real shop operations.
+                  </p>
+                </div>
+              </SectionCard>
             </div>
+          </div>
+        )}
 
-            <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
-              {selectedPart ? (
-                <>
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm text-cyan-200">Part Details</p>
-                      <h2 className="mt-1 text-2xl font-semibold">{selectedPart.partName}</h2>
-                      <p className="mt-2 text-sm text-slate-400">{selectedPart.id}</p>
+        {activeTab === "inventory" && (
+          <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+            <SectionCard
+              title="Inventory Records"
+              description="Search by VIN, vehicle, fitment, part ID, OEM number, or location."
+            >
+              <div className="mb-5 grid gap-3 md:grid-cols-3">
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search inventory..."
+                    className="w-full rounded-2xl border border-white/10 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white outline-none placeholder:text-slate-500"
+                  />
+                </div>
+
+                <div className="relative">
+                  <Filter className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <select
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                    className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/60 py-3 pl-10 pr-4 text-sm text-white outline-none"
+                  >
+                    <option>All</option>
+                    {categories.map((category) => (
+                      <option key={category}>{category}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white outline-none"
+                >
+                  <option>All</option>
+                  {statuses.map((status) => (
+                    <option key={status}>{status}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid gap-3">
+                {filteredParts.map((part) => (
+                  <div
+                    key={part.id}
+                    className={`rounded-3xl border p-4 transition ${
+                      selectedPart?.id === part.id
+                        ? "border-cyan-300/30 bg-cyan-400/10"
+                        : "border-white/10 bg-slate-900/50 hover:bg-white/10"
+                    }`}
+                  >
+                    <button
+                      onClick={() => openPartDetails(part)}
+                      className="w-full text-left"
+                    >
+                      <div className="flex flex-col gap-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="text-base font-semibold text-white">
+                                {part.partName}
+                              </h3>
+                              <StatusBadge status={part.status} />
+                            </div>
+                            <div className="mt-3 grid gap-2 text-sm text-slate-300 sm:grid-cols-2">
+                              <p>
+                                <span className="text-slate-500">Part ID:</span>{" "}
+                                {part.id}
+                              </p>
+                              <p>
+                                <span className="text-slate-500">Category:</span>{" "}
+                                {part.category}
+                              </p>
+                              <p>
+                                <span className="text-slate-500">VIN:</span>{" "}
+                                {part.sourceVin}
+                              </p>
+                              <p>
+                                <span className="text-slate-500">Fits:</span>{" "}
+                                {part.fitsVehicle}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="shrink-0 text-right">
+                            <p className="text-2xl font-semibold text-white">
+                              ${part.price}
+                            </p>
+                            <p className="mt-1 text-sm text-slate-400">
+                              Qty: {part.stockQty}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm text-slate-400">
+                          <span>{part.location}</span>
+                          <span className="inline-flex items-center gap-1 text-cyan-200">
+                            View Details <ChevronRight className="h-4 w-4" />
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+
+                    <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                      <button
+                        type="button"
+                        onClick={() => openPartDetails(part)}
+                        className="flex-1 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-sm text-slate-200 hover:bg-white/10"
+                      >
+                        <span className="inline-flex items-center gap-2">
+                          <Eye className="h-4 w-4" />
+                          View
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => openEdit(part)}
+                        className="flex-1 rounded-2xl border border-cyan-300/20 bg-cyan-400/10 px-3 py-3 text-sm text-cyan-100 hover:bg-cyan-400/20"
+                      >
+                        <span className="inline-flex items-center gap-2">
+                          <Pencil className="h-4 w-4" />
+                          Edit
+                        </span>
+                      </button>
+
+                      {currentUser.role === "Admin" && (
+                        <button
+                          type="button"
+                          onClick={() => deletePart(part.id)}
+                          className="rounded-2xl border border-rose-300/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-100 hover:bg-rose-500/20"
+                        >
+                          <span className="inline-flex items-center gap-2">
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </span>
+                        </button>
+                      )}
                     </div>
-                    <StatusBadge status={selectedPart.status} />
                   </div>
+                ))}
+              </div>
+            </SectionCard>
 
-                  <div className="mt-6 space-y-4 text-sm">
-                    <div className="rounded-3xl border border-white/10 bg-slate-900/45 p-4">
-                      <div className="mb-3 flex items-center gap-2 text-slate-200">
-                        <Car className="h-4 w-4 text-cyan-300" /> Source Information
+            <div className="hidden lg:block">
+              <SectionCard title="Part Details">
+                {selectedPart ? (
+                  <>
+                    <div className="mb-6 flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-sm text-cyan-200">Selected Part</p>
+                        <h2 className="mt-1 text-2xl font-semibold">
+                          {selectedPart.partName}
+                        </h2>
+                        <p className="mt-2 text-sm text-slate-400">
+                          {selectedPart.id}
+                        </p>
                       </div>
-                      <div className="space-y-2 text-slate-300">
-                        <p><span className="text-slate-500">VIN:</span> {selectedPart.sourceVin}</p>
-                        <p><span className="text-slate-500">Vehicle:</span> {selectedPart.sourceVehicle}</p>
-                        <p><span className="text-slate-500">Future Fitment:</span> {selectedPart.fitsVehicle}</p>
-                      </div>
+                      <StatusBadge status={selectedPart.status} />
                     </div>
-
-                    <div className="rounded-3xl border border-white/10 bg-slate-900/45 p-4">
-                      <div className="mb-3 flex items-center gap-2 text-slate-200">
-                        <DollarSign className="h-4 w-4 text-cyan-300" /> Pricing & Inventory
-                      </div>
-                      <div className="grid gap-2 text-slate-300 sm:grid-cols-2">
-                        <p><span className="text-slate-500">Retail Price:</span> ${selectedPart.price}</p>
-                        <p><span className="text-slate-500">Internal Cost:</span> ${selectedPart.cost}</p>
-                        <p><span className="text-slate-500">Quantity:</span> {selectedPart.stockQty}</p>
-                        <p><span className="text-slate-500">Warranty:</span> {selectedPart.warranty}</p>
-                      </div>
-                    </div>
-
-                    <div className="rounded-3xl border border-white/10 bg-slate-900/45 p-4">
-                      <div className="mb-3 flex items-center gap-2 text-slate-200">
-                        <MapPin className="h-4 w-4 text-cyan-300" /> Storage & Metadata
-                      </div>
-                      <div className="space-y-2 text-slate-300">
-                        <p><span className="text-slate-500">Location:</span> {selectedPart.location}</p>
-                        <p><span className="text-slate-500">Supplier:</span> {selectedPart.supplier}</p>
-                        <p><span className="text-slate-500">Acquired:</span> {selectedPart.acquiredDate}</p>
-                        <p><span className="text-slate-500">Condition:</span> {selectedPart.condition}</p>
-                        <p><span className="text-slate-500">OEM #:</span> {selectedPart.oemNumber}</p>
-                        <p><span className="text-slate-500">Updated At:</span> {selectedPart.updatedAt}</p>
-                        <p><span className="text-slate-500">Created By:</span> {selectedPart.createdBy}</p>
-                      </div>
-                    </div>
-
-                    <div className="rounded-3xl border border-white/10 bg-slate-900/45 p-4">
-                      <div className="mb-3 flex items-center gap-2 text-slate-200">
-                        <FileText className="h-4 w-4 text-cyan-300" /> Notes
-                      </div>
-                      <p className="leading-6 text-slate-300">{selectedPart.notes || "No notes recorded for this part yet."}</p>
-                    </div>
+                    <PartDetailsContent part={selectedPart} />
+                  </>
+                ) : (
+                  <div className="flex min-h-[300px] items-center justify-center text-slate-400">
+                    Select a part to view details.
                   </div>
-                </>
-              ) : (
-                <div className="flex min-h-[300px] items-center justify-center text-slate-400">Select a part to view details.</div>
-              )}
+                )}
+              </SectionCard>
             </div>
           </div>
         )}
       </div>
 
       <AnimatePresence>
-        {showPartModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+        {mobileDetailsOpen && selectedPart && (
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm lg:hidden">
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 12, scale: 0.98 }}
-              className="w-full max-w-5xl rounded-[30px] border border-white/10 bg-slate-950 p-6 shadow-2xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              className="flex h-[100dvh] flex-col bg-slate-950"
             >
-              <div className="mb-6 flex items-center justify-between gap-4">
+              <div className="flex items-start justify-between gap-4 border-b border-white/10 p-4">
                 <div>
-                  <h2 className="text-2xl font-semibold text-white">{editingId ? "Edit Inventory Part" : "Add Inventory Part"}</h2>
-                  <p className="mt-1 text-sm text-slate-400">Capture VIN source, fitment, pricing, stock, and intake details.</p>
+                  <p className="text-sm text-cyan-200">Part Details</p>
+                  <h2 className="mt-1 text-xl font-semibold text-white">
+                    {selectedPart.partName}
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-400">{selectedPart.id}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={selectedPart.status} />
+                  <button
+                    onClick={() => setMobileDetailsOpen(false)}
+                    className="rounded-2xl border border-white/10 bg-white/5 p-2 text-slate-300"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4">
+                <PartDetailsContent part={selectedPart} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 border-t border-white/10 p-4">
+                <button
+                  onClick={() => {
+                    setMobileDetailsOpen(false);
+                    openEdit(selectedPart);
+                  }}
+                  className="rounded-2xl border border-cyan-300/20 bg-cyan-400/10 px-4 py-3 text-sm font-medium text-cyan-100"
+                >
+                  <span className="inline-flex items-center gap-2">
+                    <Pencil className="h-4 w-4" />
+                    Edit
+                  </span>
+                </button>
+
+                {currentUser.role === "Admin" ? (
+                  <button
+                    onClick={() => deletePart(selectedPart.id)}
+                    className="rounded-2xl border border-rose-300/20 bg-rose-500/10 px-4 py-3 text-sm font-medium text-rose-100"
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <Trash2 className="h-4 w-4" />
+                      Delete
+                    </span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setMobileDetailsOpen(false)}
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200"
+                  >
+                    Close
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showPartModal && (
+          <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.99 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.99 }}
+              className="flex h-[100dvh] w-full flex-col overflow-hidden bg-slate-950 sm:m-4 sm:h-[calc(100dvh-2rem)] sm:rounded-[30px] sm:border sm:border-white/10"
+            >
+              <div className="flex items-start justify-between gap-4 border-b border-white/10 p-4 sm:p-6">
+                <div>
+                  <h2 className="text-2xl font-semibold text-white">
+                    {editingId ? "Edit Inventory Part" : "Add Inventory Part"}
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Capture VIN source, fitment, pricing, stock, and intake details.
+                  </p>
                 </div>
                 <button
                   onClick={() => {
@@ -1289,71 +1593,275 @@ export default function CovedaleInventoryDeployableApp() {
                 </button>
               </div>
 
-              <form onSubmit={savePart} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                <Field label="Part ID">
-                  <input value={form.id} onChange={(e) => setForm((p) => ({ ...p, id: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" required />
-                </Field>
-                <Field label="Part Name">
-                  <input value={form.partName} onChange={(e) => setForm((p) => ({ ...p, partName: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" required />
-                </Field>
-                <Field label="Category">
-                  <select value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none">
-                    {categories.map((category) => <option key={category}>{category}</option>)}
-                  </select>
-                </Field>
-                <Field label="Source VIN">
-                  <input value={form.sourceVin} onChange={(e) => setForm((p) => ({ ...p, sourceVin: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" required />
-                </Field>
-                <Field label="Source Vehicle">
-                  <input value={form.sourceVehicle} onChange={(e) => setForm((p) => ({ ...p, sourceVehicle: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" required />
-                </Field>
-                <Field label="Future Fitment">
-                  <input value={form.fitsVehicle} onChange={(e) => setForm((p) => ({ ...p, fitsVehicle: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" required />
-                </Field>
-                <Field label="OEM Number">
-                  <input value={form.oemNumber} onChange={(e) => setForm((p) => ({ ...p, oemNumber: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" />
-                </Field>
-                <Field label="Condition">
-                  <select value={form.condition} onChange={(e) => setForm((p) => ({ ...p, condition: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none">
-                    {conditions.map((condition) => <option key={condition}>{condition}</option>)}
-                  </select>
-                </Field>
-                <Field label="Status">
-                  <select value={form.status} onChange={(e) => setForm((p) => ({ ...p, status: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none">
-                    {statuses.map((status) => <option key={status}>{status}</option>)}
-                  </select>
-                </Field>
-                <Field label="Stock Quantity">
-                  <input type="number" value={form.stockQty} onChange={(e) => setForm((p) => ({ ...p, stockQty: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" required />
-                </Field>
-                <Field label="Retail Price">
-                  <input type="number" value={form.price} onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" required />
-                </Field>
-                <Field label="Internal Cost">
-                  <input type="number" value={form.cost} onChange={(e) => setForm((p) => ({ ...p, cost: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" />
-                </Field>
-                <Field label="Storage Location">
-                  <input value={form.location} onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" required />
-                </Field>
-                <Field label="Supplier">
-                  <input value={form.supplier} onChange={(e) => setForm((p) => ({ ...p, supplier: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" />
-                </Field>
-                <Field label="Acquired Date">
-                  <input type="date" value={form.acquiredDate} onChange={(e) => setForm((p) => ({ ...p, acquiredDate: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" />
-                </Field>
-                <Field label="Warranty">
-                  <input value={form.warranty} onChange={(e) => setForm((p) => ({ ...p, warranty: e.target.value }))} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" />
-                </Field>
-                <label className="block md:col-span-2 xl:col-span-3">
-                  <span className="mb-2 block text-sm text-slate-300">Notes</span>
-                  <textarea value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} rows={4} className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none" placeholder="Damage notes, test notes, interchange notes, cosmetic details, etc." />
-                </label>
-                <div className="md:col-span-2 xl:col-span-3 flex flex-wrap gap-3 pt-2">
-                  <button type="submit" className="rounded-2xl border border-cyan-300/30 bg-cyan-400/15 px-5 py-3 font-medium text-cyan-100 transition hover:bg-cyan-400/20">
-                    {editingId ? "Save Changes" : "Add Inventory Item"}
-                  </button>
-                  <button type="button" onClick={resetForm} className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 font-medium text-slate-200 transition hover:bg-white/10">
+              <form
+                onSubmit={savePart}
+                className="flex min-h-0 flex-1 flex-col"
+              >
+                <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
+                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    <Field label="Part ID">
+                      <input
+                        value={form.id}
+                        onChange={(e) =>
+                          setForm((p: any) => ({ ...p, id: e.target.value }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                        required
+                      />
+                    </Field>
+
+                    <Field label="Part Name">
+                      <input
+                        value={form.partName}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            partName: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                        required
+                      />
+                    </Field>
+
+                    <Field label="Category">
+                      <select
+                        value={form.category}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            category: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                      >
+                        {categories.map((category) => (
+                          <option key={category}>{category}</option>
+                        ))}
+                      </select>
+                    </Field>
+
+                    <Field label="Source VIN">
+                      <input
+                        value={form.sourceVin}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            sourceVin: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                        required
+                      />
+                    </Field>
+
+                    <Field label="Source Vehicle">
+                      <input
+                        value={form.sourceVehicle}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            sourceVehicle: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                        required
+                      />
+                    </Field>
+
+                    <Field label="Future Fitment">
+                      <input
+                        value={form.fitsVehicle}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            fitsVehicle: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                        required
+                      />
+                    </Field>
+
+                    <Field label="OEM Number">
+                      <input
+                        value={form.oemNumber}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            oemNumber: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                      />
+                    </Field>
+
+                    <Field label="Condition">
+                      <select
+                        value={form.condition}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            condition: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                      >
+                        {conditions.map((condition) => (
+                          <option key={condition}>{condition}</option>
+                        ))}
+                      </select>
+                    </Field>
+
+                    <Field label="Status">
+                      <select
+                        value={form.status}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            status: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                      >
+                        {statuses.map((status) => (
+                          <option key={status}>{status}</option>
+                        ))}
+                      </select>
+                    </Field>
+
+                    <Field label="Stock Quantity">
+                      <input
+                        type="number"
+                        value={form.stockQty}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            stockQty: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                        required
+                      />
+                    </Field>
+
+                    <Field label="Retail Price">
+                      <input
+                        type="number"
+                        value={form.price}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            price: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                        required
+                      />
+                    </Field>
+
+                    <Field label="Internal Cost">
+                      <input
+                        type="number"
+                        value={form.cost}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            cost: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                      />
+                    </Field>
+
+                    <Field label="Storage Location">
+                      <input
+                        value={form.location}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            location: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                        required
+                      />
+                    </Field>
+
+                    <Field label="Supplier">
+                      <input
+                        value={form.supplier}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            supplier: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                      />
+                    </Field>
+
+                    <Field label="Acquired Date">
+                      <input
+                        type="date"
+                        value={form.acquiredDate}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            acquiredDate: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                      />
+                    </Field>
+
+                    <Field label="Warranty">
+                      <input
+                        value={form.warranty}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            warranty: e.target.value,
+                          }))
+                        }
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                      />
+                    </Field>
+
+                    <label className="block md:col-span-2 xl:col-span-3">
+                      <span className="mb-2 block text-sm text-slate-300">
+                        Notes
+                      </span>
+                      <textarea
+                        value={form.notes}
+                        onChange={(e) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            notes: e.target.value,
+                          }))
+                        }
+                        rows={5}
+                        className="w-full rounded-2xl border border-white/10 bg-slate-900/60 px-4 py-3 text-white outline-none"
+                        placeholder="Damage notes, test notes, cosmetic details, interchange notes, etc."
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 border-t border-white/10 p-4 sm:flex sm:justify-end sm:p-6">
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 font-medium text-slate-200 transition hover:bg-white/10"
+                  >
                     Reset
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="rounded-2xl border border-cyan-300/30 bg-cyan-400/15 px-5 py-3 font-medium text-cyan-100 transition hover:bg-cyan-400/20"
+                  >
+                    {editingId ? "Save Changes" : "Add Inventory Item"}
                   </button>
                 </div>
               </form>
