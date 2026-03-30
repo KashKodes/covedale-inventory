@@ -1040,35 +1040,41 @@ export default function CovedaleInventoryDeployableApp() {
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
-                <h2 className="text-xl font-semibold">Production Checklist</h2>
-                <div className="mt-4 grid gap-3">
-                  {[
-                    "Supabase-ready cloud database wiring included",
-                    "Real sign-up and sign-in flow included",
-                    "Role support through user_profiles table",
-                    "Import and export tools for inventory migration",
-                    "Deploy-ready for Vercel after adding env vars",
-                    "Still works in local demo mode before launch",
-                  ].map((item) => (
-                    <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/40 px-4 py-3 text-sm text-slate-200">
-                      <CheckCircle2 className="h-4 w-4 text-cyan-300" />
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
+<div className="space-y-6">
+  <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
+    <h2 className="text-xl font-semibold">System Highlights</h2>
+    <div className="mt-4 grid gap-3">
+      {[
+        "Secure staff login with cloud-backed access",
+        "VIN source tracking for every inventory item",
+        "Future fitment tracking for compatible vehicles",
+        "Pricing, cost, quantity, warranty, and supplier fields",
+        "Clean inventory search, edit, and management workflow",
+        "Built for daily shop use across desktop and mobile browsers",
+      ].map((item) => (
+        <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/40 px-4 py-3 text-sm text-slate-200">
+          <CheckCircle2 className="h-4 w-4 text-cyan-300" />
+          {item}
+        </div>
+      ))}
+    </div>
+  </div>
 
-              <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
-                <h2 className="text-xl font-semibold">Deployment Path</h2>
-                <div className="mt-4 space-y-3 text-sm text-slate-300">
-                  <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">1. Create Supabase project and run the generated SQL.</p>
-                  <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">2. Add your Supabase URL and anon key in this file or environment variables.</p>
-                  <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">3. Deploy to Vercel so the shop can access it online from any device.</p>
-                </div>
-              </div>
-            </div>
+  <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-2xl backdrop-blur-xl">
+    <h2 className="text-xl font-semibold">Built for Covedale Service Center</h2>
+    <div className="mt-4 space-y-3 text-sm text-slate-300">
+      <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">
+        Track every part by source VIN, source vehicle, and future fitment in one place.
+      </p>
+      <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">
+        Give staff a polished internal system for inventory lookup, intake, pricing, and updates.
+      </p>
+      <p className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">
+        Present a clean, professional product experience that is ready for real shop operations.
+      </p>
+    </div>
+  </div>
+</div>
           </div>
         )}
 
